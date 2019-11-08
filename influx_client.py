@@ -1,8 +1,9 @@
 from influxdb import InfluxDBClient
 from time import *
+from testbed import *
 
 def write_to_influx(measurements):
-    client = InfluxDBClient('172.16.0.210', 5893, 'gts', 'gts', 'gtsdb')
+    client = InfluxDBClient(influxdb_ip, infuxdb_port, influxdb_username, influxdb_passwd, influxdb_db)
     client.write_points(measurements)
 
 def influxdb_preprocess_write(twping_service,src_ip,dst_ip):
