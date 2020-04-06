@@ -2,8 +2,7 @@
 #! /usr/bin/env python3.5
 
 from pysnmp.hlapi import *
-import time
-from time import sleep
+from time import sleep,strftime,strptime,gmtime,mktime
 import sys
 # from influxdb import InfluxDBClient
 from influx_client import *
@@ -11,9 +10,9 @@ from influx_client import *
 import logging
 import threading
 
-if len(sys.argv) < 6:
+if len(sys.argv) < 7:
     print(
-        "Usage python3 snmp_juniper_v2.py <source_ip> <destination_ip> <control_connection> <test_connection> <sleep_time_between_measurements>")
+        "Usage python3 snmp_juniper_v2.py <source_ip> <destination_ip> <control_connection> <test_connection> <sleep_time_between_measurements> <network_device_ip>")
 else:
 
     logging.basicConfig(level=logging.INFO, format=' %(asctime)s - %(levelname)s - %(message)s')
@@ -36,6 +35,7 @@ else:
     control_connection = sys.argv[3]
     test_connection = sys.argv[4]
     sleep_time = sys.argv[5]
+    network_device_ip = sys.argv[6]
     # Gloval varialbles
     results = {}
     # OID for juniper devices
@@ -88,7 +88,7 @@ else:
         errorIndication, errorStatus, errorIndex, varBinds = next(
             getCmd(SnmpEngine(),
                    CommunityData('public', mpModel=0),
-                   UdpTransportTarget(('172.16.0.194', 161)),
+                   UdpTransportTarget((network_device_ip, 161)),
                    ContextData(),
                    ObjectType(ObjectIdentity(abc)))
         )
@@ -97,7 +97,7 @@ else:
             print(errorIndication)
 
         elif errorStatus:
-            print('%s at %s' % (errorStatus.prettyPrint(),
+            print('%s at %s' % (errorStatus.prettyPrnt(),
                                 errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
         else:
             varBind = varBinds[0]
@@ -123,7 +123,7 @@ else:
                 errorIndication, errorStatus, errorIndex, varBinds = next(
                     getCmd(SnmpEngine(),
                            CommunityData('public', mpModel=0),
-                           UdpTransportTarget(('172.16.0.194', 161)),
+                           UdpTransportTarget((network_device_ip, 161)),
                            ContextData(),
                            ObjectType(ObjectIdentity(abc)))
                 )
@@ -139,8 +139,10 @@ else:
                     # print(k + StatisticsNames[i] + ' = ', str(value))
                     results[k + StatisticsNames[i]] = str(value/1000.0)
                     i = i + 1
-
-        # CurrentTimeF = time.strftime("%Y-%m-%d %H:%M:%S", SampleDate)
+        SampleDate = strftime("%Y-%m-%d %H:%M:%S", 
+             gmtime(mktime(strptime(SampleDate, 
+                                                    "%Y-%m-%d, %H:%M:%S"))))
+        #CurrentTimeF = time.strftime("%Y-%m-%d %H:%M:%S", SampleDate)
         json_body = [{
             "measurement": "twping_snmp",
             "tags": {"src_ip": source_ip, "dst_ip": destination_ip},
