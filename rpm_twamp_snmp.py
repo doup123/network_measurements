@@ -5,9 +5,9 @@ from pysnmp.hlapi import *
 import time
 from time import sleep
 import sys
-# from influxdb import InfluxDBClient
-#from influx_client import *
-# from testbed import *
+from influxdb import InfluxDBClient
+from influx_client import *
+from testbed import *
 import logging
 import threading
 from time import sleep,strftime,strptime,gmtime,mktime
@@ -131,8 +131,8 @@ else:
         # adding the last two indexes
         # SumCollection = 2 lastCompletedTest
         # CalSet = 4 Egress delay, 7 Ingress delay
-        metrics = {'roundTripTime': 1, 'rttJitter': 2, 'rttInterarrivalJitter': 3, 'egress': 4, 'egressJitter': 5,
-                   'egressInterarrivalJitter': 6, 'ingress': 7, 'ingressJitter': 8, 'ingressInterarrivalJitter': 9}
+        metrics = {'roundTripTime': 1, 'posRttJitter': 2, 'negRttJitter': 3, 'egress': 4, 'posEgressJitter': 5,
+                   'negEgresslJitter': 6, 'ingress': 7, 'posIngressJitter': 8, 'negIngressJitter': 9}
 
         # Obtaining Statistics
         print ()
