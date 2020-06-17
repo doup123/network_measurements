@@ -10,8 +10,8 @@ def write_to_influx(measurements):
 def influxdb_preprocess_write(twping_service,src_ip,dst_ip):
 
     json_body = [{
-        "measurement": "test_twping",
-        "tags": {"src_ip":src_ip, "dst_ip":dst_ip},
+        "measurement": "twping",
+        "tags": {"src_host":src_ip, "dst_host":dst_ip},
         "time": strftime("%Y-%m-%dT%H:%M:%S", gmtime(mktime(strptime(twping_service['time'], "%Y-%m-%dT%H:%M:%S.%f")[0:9]))),
         "fields": twping_service
     }]
